@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MoodBoard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fa;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      border-radius: 8px;
+      margin-top: 2rem;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    form {
+      margin-bottom: 2rem;
+    }
+
+    .emoji-picker {
+      display: flex;
+      justify-content: space-around;
+      margin: 1rem 0;
+      font-size: 1.5rem;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin-top: 1rem;
+      padding: 0.7rem 1.5rem;
+      background-color: #0070f3;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      display: block;
+      width: 100%;
+      font-size: 1rem;
+    }
+
+    button:hover {
+      background-color: #005ad1;
+    }
+
+    .mood-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 1rem;
+    }
+
+    .mood-entry {
+      background: #eef;
+      padding: 0.5rem;
+      text-align: center;
+      border-radius: 8px;
+      font-size: 1.2rem;
+    }
+
+    .mood-entry small {
+      display: block;
+      font-size: 0.7rem;
+      color: #555;
+      margin-top: 0.3rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧠 MoodBoard</h1>
+    <p>Track how you feel each day.</p>
+
+    <form id="mood-form">
+      <label for="mood">Today's Mood:</label>
+      <div class="emoji-picker">
+        <label><input type="radio" name="mood" value="😊" required> 😊</label>
+        <label><input type="radio" name="mood" value="😐"> 😐</label>
+        <label><input type="radio" name="mood" value="😢"> 😢</label>
+        <label><input type="radio" name="mood" value="😠"> 😠</label>
+        <label><input type="radio" name="mood" value="😍"> 😍</label>
+      </div>
+
+      <label for="note">Journal Entry:</label>
+      <textarea id="note" placeholder="Write something about your day..." required></textarea>
+
+      <button type="submit">Save Mood</button>
+    </form>
+
+    <h2>📅 Mood History</h2>
+    <div id="mood-grid" class="mood-grid"></div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('mood-form');
+      const moodGrid = document.getElementById('mood-grid');
+
+      const savedMoods = JSON.parse(localStorage.getItem('moodboard')) || [];
+
+      const renderMoods = () => {
+        moodGrid.innerHTML = '';
+        savedMoods.forEach(entry => {
+          const moodDiv = document.createElement('div');
+          moodDiv.className = 'mood-entry';
+          moodDiv.innerHTML = `
+            ${entry.mood}
+            <small>${entry.date}</small>
+          `;
+          moodGrid.appendChild(moodDiv);
+        });
+      };
+
+      renderMoods();
+
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+
+        const selectedMood = form.mood.value;
+        const note = document.getElementById('note').value;
+        const today = new Date().toLocaleDateString();
+
+        const newEntry = {
+          mood: selectedMood,
+          note: note,
+          date: today
+        };
+
+        savedMoods.unshift(newEntry);
+        localStorage.setItem('moodboard', JSON.stringify(savedMoods));
+
+        form.reset();
+        renderMoods();
+        alert("Mood saved!");
+      });
+    });
+  </script>
+</body>
+</html>
